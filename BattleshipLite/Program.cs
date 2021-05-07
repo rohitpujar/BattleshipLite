@@ -221,7 +221,7 @@ namespace BattleshipLite
                 {
                     Console.WriteLine("That was not a valid location. Please try again");
                 }
-            } while (model.ShipLocations.Count < 6);
+            } while (model.ShipLocations.Count < 5);
         }
 
         /* private static void GetShipLocations(List<GridSpotModel> shipLocations)
