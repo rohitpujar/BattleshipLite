@@ -50,7 +50,7 @@ namespace BattleshipLibrary
 
         public static bool PlayerStillActive(PlayerInfoModel player)
         {
-            // Iterate over all the ship locations. If we any ship in Sunk state, then the game is over
+            // Iterate over all the ship locations. If we find any ship in Sunk state, then the game is over
             bool isActive = false;
 
             foreach (var ship in player.ShipLocations)
@@ -91,7 +91,7 @@ namespace BattleshipLibrary
 
             foreach (var ship in model.ShipLocations)
             {
-                if(ship.SpotLetter == row.ToUpper() && ship.SpotNumber == column)
+                if (ship.SpotLetter == row.ToUpper() && ship.SpotNumber == column)
                 {
                     isValidLocation = false;
                 }
@@ -135,7 +135,7 @@ namespace BattleshipLibrary
             string row = "";
             int column = 0;
 
-            if(shot.Length != 2)
+            if (shot.Length != 2)
             {
                 throw new ArgumentException("This was an invalid shot type.", "shot");
             }
@@ -160,7 +160,7 @@ namespace BattleshipLibrary
                 {
                     if (gridSpot.Status == Enums.GridSpotStatus.Empty)
                     {
-                        isValidShot = true ;
+                        isValidShot = true;
                     }
                 }
             }
@@ -176,6 +176,9 @@ namespace BattleshipLibrary
             {
                 if (gridSpot.SpotLetter == row.ToUpper() && gridSpot.SpotNumber == column)
                 {
+                    //Bugfix: We were not setting Sunk status, so game was never ending
+                    gridSpot.Status = Enums.GridSpotStatus.Sunk;
+
                     if (gridSpot.Status == Enums.GridSpotStatus.Ship)
                     {
                         isAHit = true;
@@ -186,9 +189,9 @@ namespace BattleshipLibrary
             return isAHit;
         }
 
-        public static void MarkShotResult(PlayerInfoModel activePlayer, string row, int column, bool isAHit)
+        public static void MarkShotResult(PlayerInfoModel player, string row, int column, bool isAHit)
         {
-            foreach (var gridSpot in activePlayer.ShotGrid)
+            foreach (var gridSpot in player.ShotGrid)
             {
                 if (gridSpot.SpotLetter == row.ToUpper() && gridSpot.SpotNumber == column)
                 {

@@ -58,7 +58,7 @@ namespace BattleshipLite
 
             do
             {
-                string shot = AskforShot();
+                string shot = AskforShot(activePlayer);
                 (row, column) = GameLogic.SplitShotIntoRowAndColumn(shot);
                 isValidShot = GameLogic.ValidateShot(activePlayer, row, column);
 
@@ -81,9 +81,10 @@ namespace BattleshipLite
             GameLogic.MarkShotResult(activePlayer, row, column, isAHit);
         }
 
-        private static string AskforShot()
+        private static string AskforShot(PlayerInfoModel activePlayer)
         {
-            Console.Write("Please enter your shot selection: ");
+            Console.WriteLine();
+            Console.Write($"{activePlayer.UserName}, please enter your shot selection: ");
             string output = Console.ReadLine();
             return output;
         }
@@ -102,19 +103,19 @@ namespace BattleshipLite
 
                 if (gridSpot.Status == Enums.GridSpotStatus.Empty)
                 {
-                    Console.Write($" {gridSpot.SpotLetter}{ gridSpot.SpotNumber} ");
+                    Console.Write($"{gridSpot.SpotLetter}{ gridSpot.SpotNumber} ");
                 }
                 else if (gridSpot.Status == Enums.GridSpotStatus.Hit)
                 {
-                    Console.Write("X");
+                    Console.Write("X ");
                 }
                 else if (gridSpot.Status == Enums.GridSpotStatus.Miss)
                 {
-                    Console.Write("O");
+                    Console.Write("O ");
                 }
                 else
                 {
-                    Console.Write("?");
+                    Console.Write("? ");
                 }
             }
         }
