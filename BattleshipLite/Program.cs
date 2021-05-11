@@ -14,7 +14,6 @@ namespace BattleshipLite
         {
             DisplayWelcomeMessage();
 
-
             PlayerInfoModel activePlayer = CreatePlayer("Player 1");
             PlayerInfoModel opponent = CreatePlayer("Player 2");
             PlayerInfoModel winner = null;
@@ -157,7 +156,8 @@ namespace BattleshipLite
 
         private static void DisplayWelcomeMessage()
         {
-            Console.WriteLine("### Welcome to Battleship Lite ### \n");
+            Console.WriteLine("### Welcome to Battleship Lite ###");
+            Console.WriteLine();
         }
 
         private static string GetUsersName(string message)
