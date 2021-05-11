@@ -37,6 +37,8 @@ namespace BattleshipLite
                     winner = activePlayer;
                 }
 
+                Console.WriteLine();
+
             } while (winner == null);
 
             IdentifyWinner(winner);
@@ -53,14 +55,21 @@ namespace BattleshipLite
         private static void RecordPlayerShot(PlayerInfoModel activePlayer, PlayerInfoModel opponent)
         {
             bool isValidShot;
-            string row;
-            int column;
+            string row = "";
+            int column = 0;
 
             do
             {
                 string shot = AskforShot(activePlayer);
-                (row, column) = GameLogic.SplitShotIntoRowAndColumn(shot);
-                isValidShot = GameLogic.ValidateShot(activePlayer, row, column);
+                try
+                {
+                    (row, column) = GameLogic.SplitShotIntoRowAndColumn(shot);
+                    isValidShot = GameLogic.ValidateShot(activePlayer, row, column);
+                }
+                catch (Exception ex)
+                {
+                    isValidShot = false;
+                }
 
                 if (isValidShot == false)
                 {
@@ -69,16 +78,23 @@ namespace BattleshipLite
 
             } while (isValidShot == false);
 
-
-            // Determine if it is a valid shot. Iterate over opponent's Shiplocations and check if
-            // the list contains the object with this letter and number. If it's a match, check the status.
-            // If the status is Empty or Ship, it's a valid shot. OR
-            // Check if the value is one of the item in activePlayer's gridshot.
-            // Go back to the beginning if not a valid shot
-
             bool isAHit = GameLogic.IdentifyShotResult(opponent, row, column);
 
             GameLogic.MarkShotResult(activePlayer, row, column, isAHit);
+
+            DisplayShotResult(row, column, isAHit);
+        }
+
+        private static void DisplayShotResult(string row, int column, bool isAHit)
+        {
+            if (isAHit)
+            {
+                Console.WriteLine($"{row}{column} was a Hit!");
+            }
+            else
+            {
+                Console.WriteLine($"{row}{column} was a miss.");
+            }
         }
 
         private static string AskforShot(PlayerInfoModel activePlayer)
@@ -107,17 +123,19 @@ namespace BattleshipLite
                 }
                 else if (gridSpot.Status == Enums.GridSpotStatus.Hit)
                 {
-                    Console.Write("X ");
+                    Console.Write(" X ");
                 }
                 else if (gridSpot.Status == Enums.GridSpotStatus.Miss)
                 {
-                    Console.Write("O ");
+                    Console.Write(" O ");
                 }
                 else
                 {
-                    Console.Write("? ");
+                    Console.Write(" ? ");
                 }
             }
+
+            Console.WriteLine();
         }
 
         private static PlayerInfoModel CreatePlayer(string playerTitle)
@@ -126,75 +144,16 @@ namespace BattleshipLite
 
             Console.WriteLine($"Player information for {playerTitle}");
 
-            // Ask the user for their name
-            output.UserName = GetUsersName($"Enter {playerTitle} name");
+            output.UserName = GetUsersName($"Enter {playerTitle} name: ");
 
-            // Load up the shot grid
             GameLogic.InitializeGrid(output);
 
-            // Ask the user for their 5 ship placements
             PlaceShips(output);
 
-            // Clear the screen
             Console.Clear();
 
             return output;
         }
-
-        // Implemented by Rohit -- commenting out for now
-        /* private static void DisplayGrid(PlayerInfoModel playerInfo)
-         {
-             Console.WriteLine("Ship locations");
-             foreach (var item in playerInfo.ShipLocations)
-             {
-                 Console.Write(item.SpotLetter + item.SpotNumber);
-                 Console.Write(" ");
-             }
-             Console.WriteLine();
-             Console.WriteLine();
-
-             char[] letters = { 'X', 'A', 'B', 'C', 'D', 'E' };
-
-             for (int i = 1; i < 6; i++)
-             {
-                 //Console.Write($"   {i}");
-                 string t = i.ToString();
-
-                 int padVal = 4;
-                 if (t.Equals("1"))
-                 {
-                     padVal = 5;
-                 }
-                 Console.Write(t.PadLeft(padVal));
-             }
-
-             Console.WriteLine();
-
-
-             for (int i = 1; i < 6; i++)
-             {
-                 Console.Write(letters[i].ToString());
-
-                 int prevSpotNum = 0;
-                 foreach (var item in playerInfo.ShipLocations)
-                 {
-                     if (letters[i].ToString().Equals(item.SpotLetter.ToString()))
-                     {
-                         if (item.SpotNumber < prevSpotNum)
-                         {
-                             Console.Write("x".PadRight(Math.Abs((item.SpotNumber * 4) - (prevSpotNum * 4))));
-                         }
-                         else
-                         {
-                             Console.Write("x".PadLeft(Math.Abs((item.SpotNumber * 4) - (prevSpotNum * 4))));
-                             prevSpotNum = item.SpotNumber;
-                         }
-                     }
-                 }
-                 Console.WriteLine();
-             }
-
-         } */
 
         private static void DisplayWelcomeMessage()
         {
@@ -203,7 +162,7 @@ namespace BattleshipLite
 
         private static string GetUsersName(string message)
         {
-            Console.WriteLine(message);
+            Console.Write(message);
             string name = Console.ReadLine();
             return name;
         }
@@ -215,61 +174,22 @@ namespace BattleshipLite
                 Console.Write($"Where do you want to place ship number {model.ShipLocations.Count + 1}: ");
 
                 string location = Console.ReadLine();
+                bool isValidLocation;
 
-                bool isValidLocation = GameLogic.PlaceShip(model, location);
+                try
+                {
+                    isValidLocation = GameLogic.PlaceShip(model, location);
+                }
+                catch (Exception ex)
+                {
+                    isValidLocation = false;
+                }
 
                 if (isValidLocation == false)
                 {
                     Console.WriteLine("That was not a valid location. Please try again");
                 }
             } while (model.ShipLocations.Count < 5);
-        }
-
-        /* private static void GetShipLocations(List<GridSpotModel> shipLocations)
-         {
-             Console.WriteLine("Enter your ship locations, (example: A5)");
-
-             int i = 1;
-             do
-             {
-                 Console.WriteLine($"Enter ship { i } location");
-                 string shipLoc = Console.ReadLine();
-                 if (IsvalidSpot(shipLoc, shipLocations))
-                 {
-                     GridSpotModel shipPlacement = new GridSpotModel();
-                     shipPlacement.SpotLetter = shipLoc[0].ToString();
-                     shipPlacement.SpotNumber = int.Parse(shipLoc[1].ToString());
-                     shipLocations.Add(shipPlacement);
-                     Console.Clear();
-                     i++;
-                 }
-                 else
-                 {
-                     Console.WriteLine($"Spot {shipLoc} is taken, please enter a different location");
-                 }
-             } while (i < 6);
-
-         } */
-
-        /* private static bool IsvalidSpot(string spot, List<GridSpotModel> shipLocations)
-         {
-             string spotLetter = spot[0].ToString();
-             int spotNumber = int.Parse(spot[1].ToString());
-
-             foreach (var item in shipLocations)
-             {
-                 if (item.SpotLetter == spotLetter && item.SpotNumber == spotNumber)
-                 {
-                     return false;
-                 }
-             }
-             return true;
-         } 
-        */
-
-        private static void DisplayShotGrid()
-        {
-
         }
     }
 }

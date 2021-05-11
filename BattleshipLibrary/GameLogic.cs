@@ -50,7 +50,6 @@ namespace BattleshipLibrary
 
         public static bool PlayerStillActive(PlayerInfoModel player)
         {
-            // Iterate over all the ship locations. If we find any ship in Sunk state, then the game is over
             bool isActive = false;
 
             foreach (var ship in player.ShipLocations)
@@ -152,10 +151,8 @@ namespace BattleshipLibrary
         {
             bool isValidShot = false;
 
-            // Check players shotgrid. If the spot is Empty, it was a valid shot.
             foreach (var gridSpot in player.ShotGrid)
             {
-                // Has a bug that we missed to tackle later. We should also check if the grid spot has the status as Ship.
                 if (gridSpot.SpotLetter == row.ToUpper() && gridSpot.SpotNumber == column)
                 {
                     if (gridSpot.Status == Enums.GridSpotStatus.Empty)
@@ -176,13 +173,8 @@ namespace BattleshipLibrary
             {
                 if (gridSpot.SpotLetter == row.ToUpper() && gridSpot.SpotNumber == column)
                 {
-                    //Bugfix: We were not setting Sunk status, so game was never ending
+                    isAHit = true;
                     gridSpot.Status = Enums.GridSpotStatus.Sunk;
-
-                    if (gridSpot.Status == Enums.GridSpotStatus.Ship)
-                    {
-                        isAHit = true;
-                    }
                 }
             }
 
